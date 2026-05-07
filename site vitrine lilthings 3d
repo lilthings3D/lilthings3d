@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STRATA3D — Fichiers & Impression 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0b;
+    --off-white: #f4f2ee;
+    --cream: #ece9e2;
+    --accent: #e85d2f;
+    --accent-dim: #c44820;
+    --steel: #2a2d35;
+    --steel-light: #3d4150;
+    --muted: #7a7d87;
+    --border: rgba(255,255,255,0.08);
+    --border-light: rgba(0,0,0,0.1);
+    --card-bg: #14151a;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--black);
+    color: var(--off-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 4rem;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: rgba(10,10,11,0.85);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .logo {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+    color: var(--off-white);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--off-white); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: white !important;
+    padding: 0.5rem 1.25rem;
+    border-radius: 4px;
+    font-weight: 500 !important;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--accent-dim) !important; color: white !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 4rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,93,47,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,93,47,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+    pointer-events: none;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,93,47,0.12) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+  .hero-tag::before {
+    content: '';
+    display: block;
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 7vw, 7rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    max-width: 900px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 520px;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary:hover { background: var(--accent-dim); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--off-white);
+    padding: 0.875rem 2rem;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 400;
+    text-decoration: none;
+    border: 0.5px solid rgba(255,255,255,0.2);
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .btn-outline:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .hero-stat-num {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--off-white);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+  }
+
+  /* SECTION GENERIC */
+  section { padding: 6rem 4rem; }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--border);
+    max-width: 60px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  /* SERVICES */
+  #services {
+    background: var(--black);
+    border-top: 0.5px solid var(--border);
+  }
+
+  .services-header {
+    max-width: 600px;
+    margin-bottom: 4rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .service-card {
+    background: var(--card-bg);
+    padding: 2.5rem 2rem;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-card:hover { background: #1a1b22; }
+
+  .service-icon {
+    width: 48px; height: 48px;
+    background: rgba(232,93,47,0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: var(--accent);
+  }
+
+  .service-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .service-card p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .service-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin-top: 1.5rem;
+    transition: gap 0.2s;
+  }
+  .service-link:hover { gap: 0.7rem; }
+
+  /* CATALOGUE */
+  #catalogue {
+    background: #0d0e12;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .catalogue-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 0.5px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    font-family: var(--font-body);
+  }
+  .tab.active, .tab:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: var(--card-bg);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.2s;
+    cursor: pointer;
+  }
+  .product-card:hover { border-color: rgba(232,93,47,0.3); transform: translateY(-3px); }
+
+  .product-thumb {
+    aspect-ratio: 4/3;
+    background: var(--steel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-thumb .thumb-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1e2128 0%, #2a2d38 100%);
+  }
+
+  .product-thumb .thumb-icon {
+    position: relative;
+    z-index: 1;
+    opacity: 0.6;
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    z-index: 2;
+  }
+
+  .product-info {
+    padding: 1.25rem;
+  }
+
+  .product-category {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .product-name {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+
+  .product-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+
+  .product-price {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--off-white);
+  }
+  .product-price span {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+    font-family: var(--font-body);
+    margin-left: 0.25rem;
+  }
+
+  .btn-add {
+    background: rgba(232,93,47,0.1);
+    border: 0.5px solid rgba(232,93,47,0.3);
+    color: var(--accent);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-add:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* DEVIS */
+  #devis {
+    background: var(--black);
+    border-top: 0.5px solid var(--border);
+  }
+
+  .devis-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .devis-info h2 { margin-bottom: 1rem; }
+
+  .devis-features {
+    list-style: none;
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .devis-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .devis-feature-icon {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: rgba(232,93,47,0.08);
+    border: 0.5px solid rgba(232,93,47,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .devis-feature strong {
+    display: block;
+    color: var(--off-white);
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+
+  /* FORM */
+  .devis-form {
+    background: var(--card-bg);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 2.5rem;
+  }
+
+  .form-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    color: var(--off-white);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: rgba(232,93,47,0.5);
+  }
+
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a7d87' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: rgba(122,125,135,0.5);
+  }
+
+  .form-group select option {
+    background: #1a1b22;
+    color: var(--off-white);
+  }
+
+  .upload-zone {
+    border: 0.5px dashed rgba(232,93,47,0.3);
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: rgba(232,93,47,0.02);
+  }
+  .upload-zone:hover {
+    border-color: rgba(232,93,47,0.6);
+    background: rgba(232,93,47,0.05);
+  }
+
+  .upload-icon { font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.5; }
+  .upload-text { font-size: 0.85rem; color: var(--muted); font-weight: 300; }
+  .upload-text strong { color: var(--accent); font-weight: 500; }
+
+  .form-submit {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.9rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .form-submit:hover { background: var(--accent-dim); transform: translateY(-1px); }
+  .form-submit:active { transform: translateY(0); }
+
+  /* MATERIAUX */
+  #materiaux {
+    background: #0d0e12;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .mat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  .mat-card {
+    background: var(--card-bg);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: border-color 0.25s;
+  }
+  .mat-card:hover { border-color: rgba(232,93,47,0.3); }
+
+  .mat-color {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  .mat-name {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .mat-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  .mat-props {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .mat-prop {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 0.5px solid var(--border);
+  }
+
+  /* PROCESS */
+  #process {
+    background: var(--black);
+    border-top: 0.5px solid var(--border);
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 4rem;
+    position: relative;
+  }
+
+  .process-steps::after {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    right: 10%;
+    height: 0.5px;
+    background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+    z-index: 0;
+  }
+
+  .process-step {
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-num {
+    width: 48px; height: 48px;
+    background: var(--card-bg);
+    border: 0.5px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0;
+  }
+
+  .process-step h4 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+
+  .process-step p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #070709;
+    border-top: 0.5px solid var(--border);
+    padding: 3rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--off-white);
+  }
+  .footer-logo span { color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--off-white); }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* NOTIFICATION */
+  .notif {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #1a1b22;
+    border: 0.5px solid rgba(232,93,47,0.4);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--off-white);
+    z-index: 200;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 300px;
+  }
+  .notif.show { transform: translateY(0); opacity: 1; }
+  .notif-icon { color: var(--accent); font-size: 1.1rem; flex-shrink: 0; }
+
+  /* CART */
+  .cart-btn {
+    position: relative;
+    background: transparent;
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    color: var(--off-white);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: border-color 0.2s;
+  }
+  .cart-btn:hover { border-color: rgba(255,255,255,0.3); }
+
+  .cart-count {
+    background: var(--accent);
+    color: white;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section, .hero { padding: 4rem 1.5rem; }
+    .hero h1 { font-size: 3rem; }
+    .hero-stats { gap: 1.5rem; }
+    .services-grid { grid-template-columns: 1fr; }
+    .devis-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .process-steps::after { display: none; }
+    .process-step { padding: 0 0.75rem; margin-bottom: 2rem; }
+    footer { flex-direction: column; padding: 2rem 1.5rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .catalogue-header { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">STRATA<span>3D</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#catalogue">Catalogue</a></li>
+    <li><a href="#materiaux">Matériaux</a></li>
+    <li><a href="#devis">Devis</a></li>
+    <li><a href="#devis" class="nav-cta">Demander un devis</a></li>
+  </ul>
+  <button class="cart-btn" onclick="toggleCart()">
+    🛒 Panier
+    <span class="cart-count" id="cartCount">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-tag">Fabrication numérique</div>
+  <h1>Vos idées<br>prennent <em>forme.</em></h1>
+  <p>Fichiers 3D premium, objets imprimés sur mesure, et service d'impression à la demande. De la conception à la livraison.</p>
+  <div class="hero-actions">
+    <a href="#catalogue" class="btn-primary">Voir le catalogue →</a>
+    <a href="#devis" class="btn-outline">Demander un devis</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-num">240+</div>
+      <div class="hero-stat-label">Fichiers disponibles</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">12</div>
+      <div class="hero-stat-label">Matériaux</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">48h</div>
+      <div class="hero-stat-label">Délai moyen</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">98%</div>
+      <div class="hero-stat-label">Satisfaction client</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header">
+    <div class="section-label">Ce que je propose</div>
+    <h2 class="section-title">Trois façons<br>de travailler ensemble</h2>
+    <p class="section-sub">Des fichiers instantanément téléchargeables à l'impression de pièces uniques, choisissez ce dont vous avez besoin.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">📦</div>
+      <h3>Fichiers 3D STL/OBJ</h3>
+      <p>Téléchargez instantanément des fichiers optimisés pour l'impression FDM et résine. Testés, documentés, prêts à slicer.</p>
+      <a href="#catalogue" class="service-link">Parcourir le catalogue →</a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🖨️</div>
+      <h3>Impression sur devis</h3>
+      <p>Envoyez votre fichier ou une description de votre projet. Je m'occupe de l'impression, du post-traitement et de la livraison.</p>
+      <a href="#devis" class="service-link">Demander un devis →</a>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">✏️</div>
+      <h3>Conception sur mesure</h3>
+      <p>Besoin d'un modèle unique ? Je conçois votre objet de A à Z selon vos spécifications, et je l'imprime si vous le souhaitez.</p>
+      <a href="#devis" class="service-link">Lancer un projet →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CATALOGUE -->
+<section id="catalogue">
+  <div class="catalogue-header">
+    <div>
+      <div class="section-label">Boutique</div>
+      <h2 class="section-title">Catalogue de fichiers</h2>
+    </div>
+    <div class="filter-tabs">
+      <button class="tab active" onclick="filterProducts('all', this)">Tous</button>
+      <button class="tab" onclick="filterProducts('deco', this)">Décoration</button>
+      <button class="tab" onclick="filterProducts('fonctionnel', this)">Fonctionnel</button>
+      <button class="tab" onclick="filterProducts('miniature', this)">Miniatures</button>
+      <button class="tab" onclick="filterProducts('bijoux', this)">Bijoux</button>
+    </div>
+  </div>
+  <div class="products-grid" id="productsGrid">
+
+    <div class="product-card" data-cat="deco">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">🏺</div>
+        <span class="product-badge">Bestseller</span>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Décoration</div>
+        <div class="product-name">Vase géométrique Voronoi</div>
+        <div class="product-meta">
+          <div class="product-price">4,90 €<span>STL inclus</span></div>
+          <button class="btn-add" onclick="addToCart('Vase géométrique Voronoi', 4.90)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="fonctionnel">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">🔧</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Fonctionnel</div>
+        <div class="product-name">Support téléphone articulé</div>
+        <div class="product-meta">
+          <div class="product-price">3,50 €<span>STL inclus</span></div>
+          <button class="btn-add" onclick="addToCart('Support téléphone articulé', 3.50)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="miniature">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">⚔️</div>
+        <span class="product-badge">Nouveau</span>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Miniatures</div>
+        <div class="product-name">Guerrier médiéval — Pack</div>
+        <div class="product-meta">
+          <div class="product-price">8,90 €<span>6 fichiers</span></div>
+          <button class="btn-add" onclick="addToCart('Guerrier médiéval Pack', 8.90)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="deco">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">🌿</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Décoration</div>
+        <div class="product-name">Pot de fleurs mural modulaire</div>
+        <div class="product-meta">
+          <div class="product-price">5,50 €<span>STL inclus</span></div>
+          <button class="btn-add" onclick="addToCart('Pot de fleurs mural', 5.50)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="bijoux">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">💍</div>
+        <span class="product-badge">Premium</span>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Bijoux</div>
+        <div class="product-name">Bague torsadée paramétrique</div>
+        <div class="product-meta">
+          <div class="product-price">6,90 €<span>STL + FBX</span></div>
+          <button class="btn-add" onclick="addToCart('Bague torsadée', 6.90)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="fonctionnel">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">🗂️</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Fonctionnel</div>
+        <div class="product-name">Organisateur de bureau</div>
+        <div class="product-meta">
+          <div class="product-price">4,20 €<span>STL inclus</span></div>
+          <button class="btn-add" onclick="addToCart('Organisateur bureau', 4.20)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="miniature">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">🏰</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Miniatures</div>
+        <div class="product-name">Décor château fantastique</div>
+        <div class="product-meta">
+          <div class="product-price">12,00 €<span>Pack complet</span></div>
+          <button class="btn-add" onclick="addToCart('Décor château', 12.00)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card" data-cat="bijoux">
+      <div class="product-thumb">
+        <div class="thumb-bg"></div>
+        <div class="thumb-icon">📿</div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Bijoux</div>
+        <div class="product-name">Collier géométrique — Set</div>
+        <div class="product-meta">
+          <div class="product-price">7,50 €<span>STL inclus</span></div>
+          <button class="btn-add" onclick="addToCart('Collier géométrique', 7.50)">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MATERIAUX -->
+<section id="materiaux">
+  <div class="section-label">Matériaux disponibles</div>
+  <h2 class="section-title">Choix du matériau</h2>
+  <p class="section-sub">Chaque projet mérite le bon matériau. Je travaille avec une large gamme de filaments et résines.</p>
+
+  <div class="mat-grid">
+    <div class="mat-card">
+      <div class="mat-color" style="background: #e8e0d5;"></div>
+      <div class="mat-name">PLA</div>
+      <div class="mat-desc">Idéal pour la décoration et prototypes. Facile à imprimer, biodégradable.</div>
+      <div class="mat-props">
+        <span class="mat-prop">Doux</span>
+        <span class="mat-prop">Coloré</span>
+        <span class="mat-prop">Éco</span>
+      </div>
+    </div>
+    <div class="mat-card">
+      <div class="mat-color" style="background: #c8d4e0;"></div>
+      <div class="mat-name">PETG</div>
+      <div class="mat-desc">Résistant à l'humidité et aux chocs. Parfait pour les pièces fonctionnelles.</div>
+      <div class="mat-props">
+        <span class="mat-prop">Résistant</span>
+        <span class="mat-prop">Durable</span>
+      </div>
+    </div>
+    <div class="mat-card">
+      <div class="mat-color" style="background: #3a3a3a;"></div>
+      <div class="mat-name">ABS</div>
+      <div class="mat-desc">Haute résistance thermique et mécanique pour les environnements exigeants.</div>
+      <div class="mat-props">
+        <span class="mat-prop">Technique</span>
+        <span class="mat-prop">Chaud</span>
+      </div>
+    </div>
+    <div class="mat-card">
+      <div class="mat-color" style="background: #f5c842;"></div>
+      <div class="mat-name">TPU</div>
+      <div class="mat-desc">Flexible et élastique. Parfait pour les coques, joints et accessoires.</div>
+      <div class="mat-props">
+        <span class="mat-prop">Flex</span>
+        <span class="mat-prop">Élastique</span>
+      </div>
+    </div>
+    <div class="mat-card">
+      <div class="mat-color" style="background: #d4c5e8;"></div>
+      <div class="mat-name">Résine standard</div>
+      <div class="mat-desc">Finition ultra-précise pour bijoux, figurines et prototypes haute résolution.</div>
+      <div class="mat-props">
+        <span class="mat-prop">Précis</span>
+        <span class="mat-prop">Lisse</span>
+      </div>
+    </div>
+    <div class="mat-card">
+      <div class="mat-color" style="background: #8b7355;"></div>
+      <div class="mat-name">PLA Wood</div>
+      <div class="mat-desc">Aspect bois naturel pour des créations décoratives uniques et chaleureuses.</div>
+      <div class="mat-props">
+        <span class="mat-prop">Naturel</span>
+        <span class="mat-prop">Deco</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-label">Comment ça marche</div>
+  <h2 class="section-title">De la commande<br>à la livraison</h2>
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="step-num">01</div>
+      <h4>Votre demande</h4>
+      <p>Remplissez le formulaire de devis avec votre fichier ou description du projet, matériau souhaité et quantités.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-num">02</div>
+      <h4>Devis personnalisé</h4>
+      <p>Je vous envoie un devis détaillé sous 24h avec délai, coût et options disponibles.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-num">03</div>
+      <h4>Impression & contrôle</h4>
+      <p>Après validation, j'imprime votre pièce et réalise un contrôle qualité complet avant expédition.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-num">04</div>
+      <h4>Livraison</h4>
+      <p>Votre commande est emballée soigneusement et expédiée avec suivi. Délai moyen : 48-72h.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEVIS -->
+<section id="devis">
+  <div class="devis-layout">
+    <div class="devis-info">
+      <div class="section-label">Impression sur mesure</div>
+      <h2 class="section-title">Demandez<br>votre devis</h2>
+      <p class="section-sub">Un projet en tête ? Un fichier à imprimer ? Décrivez votre besoin et je vous réponds sous 24 heures.</p>
+
+      <ul class="devis-features">
+        <li class="devis-feature">
+          <div class="devis-feature-icon">⚡</div>
+          <div>
+            <strong>Réponse rapide</strong>
+            Devis envoyé sous 24h, impression démarrée après validation.
+          </div>
+        </li>
+        <li class="devis-feature">
+          <div class="devis-feature-icon">🎨</div>
+          <div>
+            <strong>Post-traitement inclus</strong>
+            Ponçage, peinture, vernissage disponibles selon vos besoins.
+          </div>
+        </li>
+        <li class="devis-feature">
+          <div class="devis-feature-icon">📐</div>
+          <div>
+            <strong>Toutes tailles</strong>
+            De la pièce miniature à l'objet de grande dimension, plusieurs sessions si nécessaire.
+          </div>
+        </li>
+        <li class="devis-feature">
+          <div class="devis-feature-icon">🔒</div>
+          <div>
+            <strong>Satisfaction garantie</strong>
+            Je reprends l'impression en cas de défaut. Votre satisfaction avant tout.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="devis-form">
+      <div class="form-title">Formulaire de devis</div>
+      <div class="form-subtitle">Tous les champs sont indicatifs, je m'adapte à votre projet.</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" placeholder="Marie">
+        </div>
+        <div class="form-group">
+          <label>Nom</label>
+          <input type="text" placeholder="Dupont">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="marie.dupont@email.com">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Matériau souhaité</label>
+          <select>
+            <option value="">Sélectionner...</option>
+            <option>PLA — Standard</option>
+            <option>PETG — Résistant</option>
+            <option>ABS — Technique</option>
+            <option>TPU — Flexible</option>
+            <option>Résine standard</option>
+            <option>PLA Wood</option>
+            <option>Je ne sais pas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Quantité</label>
+          <input type="number" placeholder="1" min="1">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description du projet</label>
+        <textarea rows="3" placeholder="Décrivez votre projet, dimensions approximatives, utilisation prévue..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Fichier 3D (optionnel)</label>
+        <div class="upload-zone" onclick="this.nextElementSibling.click()">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text"><strong>Cliquez pour uploader</strong> ou glissez votre fichier<br>.stl, .obj, .3mf, .step</div>
+        </div>
+        <input type="file" accept=".stl,.obj,.3mf,.step,.stp" style="display:none">
+      </div>
+
+      <button class="form-submit" onclick="submitForm()">Envoyer la demande de devis →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">STRATA<span>3D</span></div>
+  <ul class="footer-links">
+    <li><a href="#catalogue">Catalogue</a></li>
+    <li><a href="#devis">Devis</a></li>
+    <li><a href="#materiaux">Matériaux</a></li>
+    <li><a href="mailto:contact@strata3d.fr">Contact</a></li>
+  </ul>
+  <div class="footer-copy">© 2025 STRATA3D — Tous droits réservés</div>
+</footer>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif">
+  <span class="notif-icon">✓</span>
+  <span id="notifText">Article ajouté au panier</span>
+</div>
+
+<script>
+  let cartItems = 0;
+  let cartTotal = 0;
+
+  function addToCart(name, price) {
+    cartItems++;
+    cartTotal += price;
+    document.getElementById('cartCount').textContent = cartItems;
+    showNotif(`"${name}" ajouté au panier · ${cartTotal.toFixed(2)} €`);
+  }
+
+  function toggleCart() {
+    showNotif(`${cartItems} article(s) · Total : ${cartTotal.toFixed(2)} €`);
+  }
+
+  function showNotif(msg) {
+    const n = document.getElementById('notif');
+    document.getElementById('notifText').textContent = msg;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 3000);
+  }
+
+  function filterProducts(cat, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.product-card').forEach(card => {
+      if (cat === 'all' || card.dataset.cat === cat) {
+        card.style.display = '';
+        card.style.animation = 'none';
+        requestAnimationFrame(() => {
+          card.style.animation = '';
+        });
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function submitForm() {
+    showNotif('Demande envoyée ! Réponse sous 24h 🎉');
+  }
+
+  // Smooth parallax scroll for hero glow
+  window.addEventListener('scroll', () => {
+    const glow = document.querySelector('.hero-glow');
+    if (glow) {
+      glow.style.transform = `translateY(${window.scrollY * 0.3}px)`;
+    }
+  });
+</script>
+</body>
+</html>
