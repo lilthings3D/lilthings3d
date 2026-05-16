@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Votre buste en 3D — lil things 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #FAFAF8; --ink: #1A1A18; --ink-light: #6B6B67;
+  --accent: #D4522A; --border: #E8E8E4; --card: #FFFFFF;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; padding: 2.5rem 1.5rem 4rem; }
+.container { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+
+.back { font-size: 0.82rem; color: var(--ink-light); text-decoration: none; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.3rem; transition: color 0.2s; width: fit-content; }
+.back:hover { color: var(--ink); }
+
+.page-title { font-family: 'DM Serif Display', serif; font-size: 1.9rem; letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 0.4rem; }
+.page-title em { font-style: italic; color: var(--accent); }
+.page-sub { font-size: 0.88rem; color: var(--ink-light); font-weight: 300; line-height: 1.6; margin-bottom: 2rem; }
+
+/* Tips box */
+.tips-box {
+  background: #FEF6F3; border: 1px solid #f5c9b8; border-radius: 14px;
+  padding: 1.25rem 1.4rem; margin-bottom: 1.5rem;
+}
+.tips-title { font-weight: 500; font-size: 0.88rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+.tips-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.tip { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.82rem; color: var(--ink-light); font-weight: 300; line-height: 1.5; }
+.tip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 0.45rem; }
+.tip strong { color: var(--ink); font-weight: 500; }
+
+/* Form */
+.form-block { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 0.75rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field label { font-size: 0.75rem; font-weight: 500; color: var(--ink-light); letter-spacing: 0.02em; }
+.field input, .field textarea, .field select {
+  width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--border); border-radius: 9px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--ink); background: var(--cream); outline: none; transition: border-color 0.2s, background 0.2s;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--ink); background: var(--card); }
+.field textarea { resize: vertical; min-height: 100px; }
+
+/* Photo zone — mise en avant */
+.photo-zone {
+  width: 100%; border: 2px dashed rgba(212,82,42,0.35); border-radius: 14px; padding: 1.75rem 1rem;
+  text-align: center; cursor: pointer; background: #FEF6F3; position: relative; transition: border-color 0.2s, background 0.2s;
+}
+.photo-zone:hover { border-color: var(--accent); background: #fef0e8; }
+.photo-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.photo-zone-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.photo-zone-title { font-size: 0.9rem; font-weight: 500; color: var(--ink); margin-bottom: 0.3rem; }
+.photo-zone-sub { font-size: 0.78rem; color: var(--ink-light); font-weight: 300; }
+.photo-name { font-size: 0.82rem; color: var(--accent); margin-top: 0.6rem; font-weight: 500; }
+
+/* Submit */
+.btn-submit { width: 100%; padding: 1rem; background: var(--ink); color: white; border: none; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; margin-top: 0.25rem; }
+.btn-submit:hover { background: var(--accent); transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.form-note { font-size: 0.72rem; color: var(--ink-light); font-weight: 300; text-align: center; margin-top: 0.5rem; }
+
+/* Warning note */
+.photo-warning {
+  background: #fffbea; border: 1px solid #f5e4a0; border-radius: 10px;
+  padding: 0.75rem 1rem; font-size: 0.78rem; color: #7a6a20; font-weight: 300; line-height: 1.5;
+}
+.photo-warning strong { font-weight: 500; }
+
+/* Success */
+.success { display: none; flex-direction: column; align-items: center; text-align: center; gap: 1rem; padding: 3rem 1rem; }
+.success.visible { display: flex; }
+.success-icon { width: 56px; height: 56px; background: #FEF6F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.success-icon svg { width: 28px; height: 28px; color: var(--accent); }
+.success h2 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; }
+.success p { font-size: 0.88rem; color: var(--ink-light); font-weight: 300; line-height: 1.6; }
+.btn-back-success { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.75rem 1.5rem; background: var(--ink); color: white; border-radius: 100px; text-decoration: none; font-size: 0.88rem; font-weight: 500; margin-top: 0.5rem; transition: background 0.2s; }
+.btn-back-success:hover { background: var(--accent); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.container > * { animation: fadeUp 0.45s ease both; }
+
+@media(max-width:420px) { .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="back">← Retour</a>
+
+  <h1 class="page-title">Votre <em>buste</em> en 3D</h1>
+  <p class="page-sub">Envoie-moi une photo nette de face et je modélise puis imprime ton buste. Un cadeau unique garanti.</p>
+
+  <div class="tips-box">
+    <div class="tips-title">📸 Pour un résultat parfait</div>
+    <div class="tips-list">
+      <div class="tip"><div class="tip-dot"></div><span><strong>Photo de face</strong>, regard droit vers l'objectif</span></div>
+      <div class="tip"><div class="tip-dot"></div><span><strong>Bonne lumière naturelle</strong>, évite les ombres dures</span></div>
+      <div class="tip"><div class="tip-dot"></div><span>Visage et épaules bien visibles, <strong>fond neutre</strong> de préférence</span></div>
+      <div class="tip"><div class="tip-dot"></div><span>Pas de filtre, <strong>photo récente</strong>, la plus nette possible</span></div>
+      <div class="tip"><div class="tip-dot"></div><span>Tu peux aussi envoyer plusieurs angles pour plus de précision</span></div>
+    </div>
+  </div>
+
+  <div id="formWrap">
+
+    <!-- Contact -->
+    <div class="form-block">
+      <div class="form-row">
+        <div class="field"><label>Prénom *</label><input type="text" id="fPrenom" placeholder="Marie"></div>
+        <div class="field"><label>Nom</label><input type="text" id="fNom" placeholder="Dupont"></div>
+      </div>
+      <div class="field"><label>Email *</label><input type="email" id="fEmail" placeholder="marie@email.com"></div>
+      <div class="field"><label>Téléphone (facultatif)</label><input type="tel" id="fTel" placeholder="06 12 34 56 78"></div>
+    </div>
+
+    <!-- Photo -->
+    <div class="form-block">
+      <div class="field">
+        <label>Ta photo de face *</label>
+        <div class="photo-zone">
+          <input type="file" id="fPhoto" accept="image/*" onchange="showPhotoName()">
+          <div class="photo-zone-icon">🤳</div>
+          <div class="photo-zone-title">Glisse ta photo ici ou clique</div>
+          <div class="photo-zone-sub">JPG · PNG · HEIC · La plus nette possible</div>
+          <div class="photo-name" id="photoName"></div>
+        </div>
+      </div>
+      <div class="photo-warning">
+        ⚠️ <strong>Important :</strong> si la photo ne peut pas être jointe via le formulaire, je t'enverrai un email de confirmation et tu pourras me la transmettre en réponse.
+      </div>
+    </div>
+
+    <!-- Détails buste -->
+    <div class="form-block">
+      <div class="field">
+        <label>Pour qui est ce buste ?</label>
+        <input type="text" id="fPourQui" placeholder="Pour moi, cadeau pour mon père, surprise pour un ami…">
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Taille souhaitée</label>
+          <select id="fTaille">
+            <option value="">Je ne sais pas</option>
+            <option>Petite (~10 cm)</option>
+            <option>Moyenne (~15 cm)</option>
+            <option>Grande (~20 cm)</option>
+            <option>Sur mesure — je précise</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Couleur souhaitée</label>
+          <input type="text" id="fCouleur" placeholder="Blanc, noir, couleur peau…">
+        </div>
+      </div>
+      <div class="field">
+        <label>Infos complémentaires</label>
+        <textarea id="fInfos" placeholder="Occasion particulière, délai souhaité, demande spéciale…"></textarea>
+      </div>
+      <div class="field">
+        <label>Budget approximatif</label>
+        <select id="fBudget">
+          <option value="">Je ne sais pas encore</option>
+          <option>Moins de 30€</option>
+          <option>30€ – 60€</option>
+          <option>60€ – 100€</option>
+          <option>Plus de 100€</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitForm()">Envoyer ma demande →</button>
+    <p class="form-note">Réponse sous 24–48h · Devis gratuit · Aucun engagement</p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success" id="successMsg">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+    </div>
+    <h2>Demande envoyée !</h2>
+    <p>Je reviens vers toi à<br><strong id="successEmail"></strong><br>sous 24–48h avec un devis pour ton buste.<br><br>Si ta photo n'a pas pu être jointe, envoie-la moi en réponse à mon email 🙏</p>
+    <a href="index.html" class="btn-back-success">← Retour à l'accueil</a>
+  </div>
+
+</div>
+
+<script>
+emailjs.init('JeHX5X-N1ZCTr1GvC');
+
+function showPhotoName() {
+  const f = document.getElementById('fPhoto').files[0];
+  if (f) document.getElementById('photoName').textContent = '✓ ' + f.name;
+}
+
+function submitForm() {
+  const prenom = document.getElementById('fPrenom').value.trim();
+  const email  = document.getElementById('fEmail').value.trim();
+
+  if (!prenom)          { alert('Merci d\'indiquer ton prénom.'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Adresse email invalide.'); return; }
+
+  const photo    = document.getElementById('fPhoto').files[0];
+  const pourQui  = document.getElementById('fPourQui').value.trim();
+  const taille   = document.getElementById('fTaille').value;
+  const couleur  = document.getElementById('fCouleur').value.trim();
+  const infos    = document.getElementById('fInfos').value.trim();
+  const budget   = document.getElementById('fBudget').value;
+
+  const extra = [
+    `Pour qui : ${pourQui || '—'}`,
+    `Taille : ${taille || 'Non précisée'}`,
+    `Couleur : ${couleur || '—'}`,
+    `Photo : ${photo ? photo.name : 'Non jointe — à envoyer par email en réponse'}`,
+  ].join(' | ');
+
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = 'Envoi en cours…';
+  btn.disabled = true;
+
+  emailjs.send('service_msrlt4o', 'template_uayllkc', {
+    service:     'Buste personnalisé en 3D',
+    prenom:      prenom,
+    nom:         document.getElementById('fNom').value.trim() || '—',
+    email:       email,
+    telephone:   document.getElementById('fTel').value.trim() || '—',
+    description: infos || '—',
+    budget:      budget || 'Non précisé',
+    extra:       extra,
+  })
+  .then(() => {
+    document.getElementById('successEmail').textContent = email;
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successMsg').classList.add('visible');
+  })
+  .catch(() => {
+    btn.textContent = 'Envoyer ma demande →';
+    btn.disabled = false;
+    alert('Erreur lors de l\'envoi 😕\nÉcris-moi directement à lilthings.3d@outlook.com');
+  });
+}
+</script>
+</body>
+</html>
