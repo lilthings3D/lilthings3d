@@ -74,6 +74,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .btn-back-success { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.75rem 1.5rem; background: var(--ink); color: white; border-radius: 100px; text-decoration: none; font-size: 0.88rem; font-weight: 500; margin-top: 0.5rem; transition: background 0.2s; }
 .btn-back-success:hover { background: var(--accent); }
 
+.paypal-info {
+  background: #f0f4ff; border: 1px solid #c8d4f5; border-radius: 12px;
+  padding: 1rem 1.25rem; margin-top: 0.75rem;
+}
+.paypal-info-title { font-size: 0.85rem; font-weight: 500; color: var(--ink); margin-bottom: 0.3rem; }
+.paypal-info-text { font-size: 0.78rem; color: var(--ink-light); font-weight: 300; line-height: 1.5; }
+
+.btn-paypal {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.85rem 2rem; background: #0070ba; color: white;
+  border-radius: 100px; text-decoration: none; font-size: 0.9rem; font-weight: 500;
+  transition: background 0.2s; margin-top: 0.5rem;
+}
+.btn-paypal:hover { background: #005ea6; }
+
 @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 .container > * { animation: fadeUp 0.45s ease both; }
 
@@ -166,13 +181,17 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <div class="file-zone-title">Glisse une photo ici ou clique</div>
           <div class="file-zone-sub">JPG · PNG · HEIC acceptés</div>
           <div class="file-name" id="photoNameDisplay"></div>
-        </div>  
-        </select>
+        </div>
       </div>
     </div>
 
     <button class="btn-submit" onclick="submitForm()">Envoyer ma demande →</button>
     <p class="form-note">Réponse sous 24–48h · Devis gratuit · Aucun engagement</p>
+
+    <div class="paypal-info">
+      <div class="paypal-info-title">💳 Comment ça se passe après ?</div>
+      <div class="paypal-info-text">Une fois ton devis accepté, le paiement se fait via PayPal en toute sécurité. Je t'envoie le lien directement par email.</div>
+    </div>
   </div>
 
   <!-- SUCCESS -->
@@ -181,7 +200,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
     </div>
     <h2>Demande envoyée !</h2>
-    <p>Je reviens vers toi à<br><strong id="successEmail"></strong><br>sous 24–48h avec un devis détaillé.</p>
+    <p>Je reviens vers toi à<br><strong id="successEmail"></strong><br>sous 24–48h avec un devis détaillé.<br><br>Le paiement se fera ensuite via PayPal 🔒</p>
+    <a href="https://paypal.me/lilthings3d" target="_blank" class="btn-paypal">Payer via PayPal</a>
     <a href="index.html" class="btn-back-success">← Retour à l'accueil</a>
   </div>
 
