@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impression sur mesure — lil things 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #FAFAF8; --ink: #1A1A18; --ink-light: #6B6B67;
+  --accent: #D4522A; --border: #E8E8E4; --card: #FFFFFF;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; padding: 2.5rem 1.5rem 4rem; }
+.container { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+
+.back { font-size: 0.82rem; color: var(--ink-light); text-decoration: none; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.3rem; transition: color 0.2s; width: fit-content; }
+.back:hover { color: var(--ink); }
+
+.page-title { font-family: 'DM Serif Display', serif; font-size: 1.9rem; letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 0.4rem; }
+.page-title em { font-style: italic; color: var(--accent); }
+.page-sub { font-size: 0.88rem; color: var(--ink-light); font-weight: 300; line-height: 1.6; margin-bottom: 2rem; }
+
+/* Service choice */
+.service-label { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 0.6rem; }
+.service-cards { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.75rem; }
+.service-card { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.1rem; background: var(--card); border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.service-card.selected { border-color: var(--accent); background: #FEF6F3; }
+.service-card input[type="radio"] { display: none; }
+.service-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--cream); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.service-icon svg { width: 18px; height: 18px; }
+.service-name { font-weight: 500; font-size: 0.88rem; line-height: 1.2; margin-bottom: 0.25rem; }
+.service-desc { font-size: 0.77rem; color: var(--ink-light); font-weight: 300; line-height: 1.4; }
+
+/* Form */
+.form-block { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 0.75rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field label { font-size: 0.75rem; font-weight: 500; color: var(--ink-light); letter-spacing: 0.02em; }
+.field input, .field textarea, .field select {
+  width: 100%; padding: 0.7rem 0.9rem; border: 1px solid var(--border); border-radius: 9px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--ink); background: var(--cream); outline: none; transition: border-color 0.2s, background 0.2s;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--ink); background: var(--card); }
+.field textarea { resize: vertical; min-height: 120px; }
+
+/* File zone */
+.file-zone { width: 100%; border: 1.5px dashed var(--border); border-radius: 9px; padding: 1.1rem; text-align: center; cursor: pointer; background: var(--cream); position: relative; transition: border-color 0.2s; }
+.file-zone:hover { border-color: var(--ink-light); }
+.file-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.file-zone-title { font-size: 0.82rem; font-weight: 500; color: var(--ink); margin-bottom: 0.2rem; }
+.file-zone-sub { font-size: 0.75rem; color: var(--ink-light); font-weight: 300; }
+.file-name { font-size: 0.78rem; color: var(--accent); margin-top: 0.4rem; font-weight: 500; }
+
+/* Conditional block */
+.conditional { display: none; }
+.conditional.visible { display: flex; flex-direction: column; gap: 1rem; }
+
+/* Submit */
+.btn-submit { width: 100%; padding: 1rem; background: var(--ink); color: white; border: none; border-radius: 100px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.15s; margin-top: 0.25rem; }
+.btn-submit:hover { background: var(--accent); transform: translateY(-1px); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.form-note { font-size: 0.72rem; color: var(--ink-light); font-weight: 300; text-align: center; margin-top: 0.5rem; }
+
+/* Success */
+.success { display: none; flex-direction: column; align-items: center; text-align: center; gap: 1rem; padding: 3rem 1rem; }
+.success.visible { display: flex; }
+.success-icon { width: 56px; height: 56px; background: #FEF6F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.success-icon svg { width: 28px; height: 28px; color: var(--accent); }
+.success h2 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; }
+.success p { font-size: 0.88rem; color: var(--ink-light); font-weight: 300; line-height: 1.6; }
+.btn-back-success { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.75rem 1.5rem; background: var(--ink); color: white; border-radius: 100px; text-decoration: none; font-size: 0.88rem; font-weight: 500; margin-top: 0.5rem; transition: background 0.2s; }
+.btn-back-success:hover { background: var(--accent); }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.container > * { animation: fadeUp 0.45s ease both; }
+
+@media(max-width:420px) { .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="back">← Retour</a>
+
+  <h1 class="page-title">Impression <em>sur mesure</em></h1>
+  <p class="page-sub">Décris ton projet et je te fais un devis sous 24–48h. Gratuit, sans engagement.</p>
+
+  <div id="formWrap">
+    <!-- Choix du service -->
+    <div class="service-label">Tu as déjà un fichier ?</div>
+    <div class="service-cards">
+      <label class="service-card" id="card-oui" onclick="selectService('oui')">
+        <input type="radio" name="service" value="oui">
+        <div class="service-icon">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#1A1A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="service-name">✅ Oui, j'ai mon fichier STL / 3MF</div>
+          <div class="service-desc">Je t'envoie le fichier, tu l'imprimes et tu l'expédies.</div>
+        </div>
+      </label>
+      <label class="service-card" id="card-non" onclick="selectService('non')">
+        <input type="radio" name="service" value="non">
+        <div class="service-icon">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M4 17l4-4m0 0l5-5M8 13l-1.5 1.5M13 8l-1 1M3 17h3l8-8-3-3-8 8v3z" stroke="#1A1A18" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="service-name">✏️ Non, j'ai besoin de modélisation aussi</div>
+          <div class="service-desc">Tu me décris l'objet, je le modélise et je l'imprime.</div>
+        </div>
+      </label>
+    </div>
+
+    <!-- Infos contact -->
+    <div class="form-block">
+      <div class="form-row">
+        <div class="field"><label>Prénom *</label><input type="text" id="fPrenom" placeholder="Marie"></div>
+        <div class="field"><label>Nom</label><input type="text" id="fNom" placeholder="Dupont"></div>
+      </div>
+      <div class="field"><label>Email *</label><input type="email" id="fEmail" placeholder="marie@email.com"></div>
+      <div class="field"><label>Téléphone (facultatif)</label><input type="tel" id="fTel" placeholder="06 12 34 56 78"></div>
+    </div>
+
+    <!-- Bloc spécifique fichier existant -->
+    <div class="form-block conditional" id="blockOui">
+      <div class="field">
+        <label>Ton fichier STL / 3MF</label>
+        <div class="file-zone">
+          <input type="file" id="fFichier" accept=".stl,.3mf,.obj,.step" onchange="showFileName('fFichier','fileNameDisplay')">
+          <div class="file-zone-title">Glisse ton fichier ici ou clique</div>
+          <div class="file-zone-sub">.STL · .3MF · .OBJ · .STEP acceptés</div>
+          <div class="file-name" id="fileNameDisplay"></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Couleur souhaitée</label><input type="text" id="fCouleur" placeholder="Ex : noir mat, blanc…"></div>
+        <div class="field"><label>Quantité</label><input type="number" id="fQty" placeholder="1" min="1"></div>
+      </div>
+      <div class="field">
+        <label>Matériau souhaité</label>
+        <select id="fMat">
+          <option value="">Je ne sais pas / au choix</option>
+          <option>PLA — Standard</option>
+          <option>PETG — Résistant</option>
+          <option>ABS — Technique</option>
+          <option>TPU — Flexible</option>
+          <option>Résine</option>
+          <option>PLA Wood</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Description commune -->
+    <div class="form-block">
+      <div class="field">
+        <label id="descLabel">Description du projet *</label>
+        <textarea id="fDesc" placeholder="Décris ton projet : dimensions, usage, contraintes particulières, délai souhaité…"></textarea>
+      </div>
+      <div class="field">
+        <label>Photo de référence (facultatif)</label>
+        <div class="file-zone">
+          <input type="file" id="fPhoto" accept="image/*" onchange="showFileName('fPhoto','photoNameDisplay')">
+          <div class="file-zone-title">Glisse une photo ici ou clique</div>
+          <div class="file-zone-sub">JPG · PNG · HEIC acceptés</div>
+          <div class="file-name" id="photoNameDisplay"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Budget approximatif</label>
+        <select id="fBudget">
+          <option value="">Je ne sais pas encore</option>
+          <option>Moins de 20€</option>
+          <option>20€ – 50€</option>
+          <option>50€ – 100€</option>
+          <option>Plus de 100€</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitForm()">Envoyer ma demande →</button>
+    <p class="form-note">Réponse sous 24–48h · Devis gratuit · Aucun engagement</p>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success" id="successMsg">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+    </div>
+    <h2>Demande envoyée !</h2>
+    <p>Je reviens vers toi à<br><strong id="successEmail"></strong><br>sous 24–48h avec un devis détaillé.</p>
+    <a href="index.html" class="btn-back-success">← Retour à l'accueil</a>
+  </div>
+
+</div>
+
+<script>
+let selectedService = '';
+
+emailjs.init('JeHX5X-N1ZCTr1GvC');
+
+function selectService(type) {
+  selectedService = type;
+  document.getElementById('card-oui').classList.toggle('selected', type === 'oui');
+  document.getElementById('card-non').classList.toggle('selected', type === 'non');
+  document.getElementById('blockOui').classList.toggle('visible', type === 'oui');
+  const desc = document.getElementById('descLabel');
+  const txt = document.getElementById('fDesc');
+  if (type === 'oui') {
+    desc.textContent = 'Infos complémentaires';
+    txt.placeholder = 'Dimensions max, finition voulue, délai si urgent, infos utiles…';
+  } else {
+    desc.textContent = 'Décris ton projet *';
+    txt.placeholder = 'Décris l\'objet voulu : dimensions, forme, usage, matériau, couleur, quantité…';
+  }
+}
+
+function showFileName(inputId, displayId) {
+  const f = document.getElementById(inputId).files[0];
+  if (f) document.getElementById(displayId).textContent = '✓ ' + f.name;
+}
+
+function submitForm() {
+  const prenom = document.getElementById('fPrenom').value.trim();
+  const email  = document.getElementById('fEmail').value.trim();
+  const desc   = document.getElementById('fDesc').value.trim();
+
+  if (!selectedService) { alert('Choisis d\'abord si tu as un fichier ou non 👆'); return; }
+  if (!prenom)          { alert('Merci d\'indiquer ton prénom.'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('Adresse email invalide.'); return; }
+  if (!desc && selectedService === 'non') { alert('Décris ton projet pour que je puisse faire un devis précis.'); return; }
+
+  const serviceLabel = selectedService === 'oui' ? 'Impression seule (fichier fourni)' : 'Modélisation + Impression';
+
+  let extra = '—';
+  if (selectedService === 'oui') {
+    const couleur = document.getElementById('fCouleur').value.trim();
+    const qty     = document.getElementById('fQty').value.trim();
+    const mat     = document.getElementById('fMat').value;
+    const fichier = document.getElementById('fFichier').files[0];
+    extra = `Couleur : ${couleur || '—'} | Quantité : ${qty || '1'} | Matériau : ${mat || 'Au choix'} | Fichier : ${fichier ? fichier.name : 'Non joint — à envoyer par réponse email'}`;
+  }
+
+  const photo = document.getElementById('fPhoto').files[0];
+  if (photo) extra += ` | Photo : ${photo.name}`;
+
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = 'Envoi en cours…';
+  btn.disabled = true;
+
+  emailjs.send('service_msrlt4o', 'template_uayllkc', {
+    service:     serviceLabel,
+    prenom:      prenom,
+    nom:         document.getElementById('fNom').value.trim() || '—',
+    email:       email,
+    telephone:   document.getElementById('fTel').value.trim() || '—',
+    description: desc || '—',
+    budget:      document.getElementById('fBudget').value || 'Non précisé',
+    extra:       extra,
+  })
+  .then(() => {
+    document.getElementById('successEmail').textContent = email;
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successMsg').classList.add('visible');
+  })
+  .catch(() => {
+    btn.textContent = 'Envoyer ma demande →';
+    btn.disabled = false;
+    alert('Erreur lors de l\'envoi 😕\nÉcris-moi directement à lilthings.3d@outlook.com');
+  });
+}
+</script>
+</body>
+</html>
